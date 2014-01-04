@@ -1,0 +1,10 @@
+;exercise 1.16
+
+(define (expt b x y n) (cond ((= n 0) y) ((even? n) (expt b (* x x) y (/ n 2))) (else (expt b x (* x y) (- n 1))))))
+
+(define (even? n) (= (remainder n 2) 0))
+
+(expt 2 2 1 10)
+
+(expt 2 2 1 8)
+
