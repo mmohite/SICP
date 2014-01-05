@@ -66,4 +66,36 @@
 
 (define (smallest_divisor n divisor) (cond ((< n (square divisor)) n) ((divisible? n divisor) divisor) (else (smallest_divisor n (next divisor)))))
 
+;;; exercise 1.24
+
+(define (expmod base exp m) (cond ((= exp 0) 1) ((even? exp) (remainder (square (expmod base (/ exp 2) m)) m)) (else (remainder (* base (expmod base (- exp 1) m)) m))))
+
+(define (fast_prime n) (try_it (+ (random (- n 1)) 1) n))
+
+(define (try_it a n) (= (expmod a n n) a))
+
+;;; exercise 1.27
+
+(define (test_carmichael_number n count) (cond ((= count n) #t) ((try_it count n) (test_carmichael_number n (+ count 1))) (else #f)))
+
+
+
+;;; exercise 1.29
+
+(define (sum term a next b) (if (> a b) 0 (+ (term a) (sum term (next a) next b))))
+(define (integral f a b dx) (define (next_term x) (+ x dx)) (* (sum cube (+ a (/ dx 2)) next_term b) dx))
+
+
+(define (sum_simpson term a next b next_multiplier multiplier total count n) 
+(if (= count n) (+ total (term a))
+(sum_simpson term (next a) next b next_multiplier  (+ (* multiplier (term a)) total) (+ count 1) n)))
+
+
+(define (simpsons_rule f a b n) 
+    (define h (/ (- b a) n))
+    (define (next_multiplier x) (if (= x 4) 2 4))
+    (define (next_term x) (+ x h)) 
+    (/ (* (sum_simpson f a next_term b next_multiplier 1 0 0 n) h) 3.0))
+
+
 
