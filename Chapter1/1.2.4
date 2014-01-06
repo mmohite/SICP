@@ -97,5 +97,54 @@
     (define (next_term x) (+ x h)) 
     (/ (* (sum_simpson f a next_term b next_multiplier 1 0 0 n) h) 3.0))
 
+;;; exercise 1.30 
+(define (sum term a next b) (define (iter a result) (if (> a b) result (iter (next a) (+ result (term a)))))
+    (iter a 0))
+
+
+;;; exercise 1.31
+
+(define (product_recur term a next b) (if (> a b) 1 (* (term a) (product_recur term (next a) next b))))
+(define (factorial n) (define (next_term a) (+ a 1)) (define (term a) a) (product_recur term 1 next_term n))
+
+(define (pi_calculation n) (define (next_term a) (+ a 2))
+    (define (term a) (square (/ a (+ a 1))))
+    (* (product_iter term 2.0 next_term n) 2 (+ n 1)))
+
+
+(define (product_iter term a next b) (define (iter a result) (if (> a b) result (iter (next a) (* (term a) result)))) (iter a 1))
+
+
+;;; exercise 1.32
+
+(define (accumulate combiner null_value term a next b) (if (a > b) null_value (combiner (term a) (accumulate combiner null_value term a next b))))
+
+(define (accumulate combiner null_value term a next b)
+    (define (iter a result) 
+        (if (> a b) 
+            result 
+        (iter (next a) (combiner (term a) result))))
+    (iter a null_value))
+
+(define (product term a next b) (define (combiner a b) (* a b)) (accumulate combiner 1.0 term a next b))
+
+(define (sum term a next b) (define (combiner a b) (+ a b)) (accumulate combiner 0 term a next b))
+
+
+
+;;; exercise 1.33
+
+(define (filtered_accumulate pred? combiner null_value term a next b) 
+    (define (iter a result) 
+        (cond ((> a b) result)
+        ((pred? a) (iter (next a) (combiner (term a) result)))
+        (else (iter (next a) result))))
+    (iter a null_value))
+
+(define (sum_primes a b) 
+    (define (combiner x y) (+ x y)) 
+    (define (next_term x) (+ x 1)) 
+    (filtered_accumulate prime? combiner 0 square a next_term b))
+
 
 
