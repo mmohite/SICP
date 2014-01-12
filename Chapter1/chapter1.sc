@@ -147,4 +147,62 @@
     (filtered_accumulate prime? combiner 0 square a next_term b))
 
 
+;;; exercise 1.34
+(define (f g) (g 2))
+
+;Value: f
+
+(f f)
+
+;The object 2 is not applicable.
+;To continue, call RESTART with an option number:
+; (RESTART 3) => Specify a procedure to use in its place.
+; (RESTART 2) => Return to read-eval-print level 2.
+; (RESTART 1) => Return to read-eval-print level 1.
+
+
+(define (average a b) (/ (+ a b) 2))
+(define (close_enough? a b) (< (abs (- a b)) .001))
+
+
+(define (search f neg_value pos_value) (let ((a (f neg_value)) (b (f pos_value))(avg (average neg_value pos_value))) 
+    (cond ((close_enough? (f avg) 0) avg) 
+    ((< (f avg) 0) (search f avg pos_value))
+    ((> (f avg) 0) (search f neg_value avg))
+    ((= (f avg) 0) avg)
+)))
+
+
+(define (half_interval f a b) (cond ((and (> (f a) 0) (< (f b) 0)) (search f b a))
+    ((and (> (f b) 0) (< (f a) 0)) (search f a b))
+    (else (display "wrong input"))))
+
+
+(define (fixed_point f guess) (let ((next (f guess))) (newline) (display guess)  (if (close_enough? guess next) next (fixed_point f next))))
+
+(fixed_point sin 2.0)
+
+;Value: .1799525495914556
+
+(fixed_point cos 1.0)
+;Value: .7387603198742113
+
+
+(define (sqrt x) (fixed_point (lambda (y) (/ (+ y (/ x y)) 2.0)) 1.0))
+
+(define (power ) (fixed_point (lambda (x) (/ (+ x (/ (log 1000) (log x))) 2.0)) 10.0))
+
+(define (cont-frac n d k) (define (iter i result) (if (= i 0) result (iter (- i 1) (/ (n i) (+ (d i) result))))) (iter k 0))
+
+;;Example
+
+(cont-frac (lambda (x) 1.0) (lambda (y) 1.0) 11)  
+
+;Value: .6180555555555556
+
+
+(define (euler_identity k) (+ 2.0 (cont-frac (lambda (x) 1.0) (lambda (y) (if (= (remainder y 3.0) 2.0) (- y (/ (- y 2.0) 3.0)) 1.0)) k)))
+
+
+
 
