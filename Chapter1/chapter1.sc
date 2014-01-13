@@ -190,8 +190,11 @@
 
 (define (sqrt x) (fixed_point (lambda (y) (/ (+ y (/ x y)) 2.0)) 1.0))
 
+;; exercise 1.36
+
 (define (power ) (fixed_point (lambda (x) (/ (+ x (/ (log 1000) (log x))) 2.0)) 10.0))
 
+;; exercise 1.37
 (define (cont-frac n d k) (define (iter i result) (if (= i 0) result (iter (- i 1) (/ (n i) (+ (d i) result))))) (iter k 0))
 
 ;;Example
@@ -200,8 +203,69 @@
 
 ;Value: .6180555555555556
 
+;; exercise 1.38
 
 (define (euler_identity k) (+ 2.0 (cont-frac (lambda (x) 1.0) (lambda (y) (if (= (remainder y 3.0) 2.0) (- y (/ (- y 2.0) 3.0)) 1.0)) k)))
+
+
+;; exercise 1.39
+(define (tangent x k) (/ (* -1 (cont-frac (lambda (a) (* -1 (square x))) (lambda (b) (- (* 2.0 b) 1)) (- k 1))) x))
+
+
+
+(define (average_damp f) (lambda (x) (average x (f x))))
+
+(define (sqrt x) (fixed_point (average_damp (lambda (y) (/ x y))) 1.0))
+
+(define (cube_root x) (fixed_point (average_damp (lambda (y) (/ x (square y)))) 1.0))
+
+
+(define dx 0.0000001)
+
+(define (derivative g) (lambda (x) (/ (- (g (+ x dx)) (g x)) dx)))
+
+(define (newton_equation g x) (lambda (x) (- x (/ (g x) ((derivative g) x)))))
+
+(define (newton_method g x) (fixed_point (newton_equation g x) 1.0))
+
+(define (sqrt x) (newton_method (lambda (y) (- (square y) x)) x))
+
+;; exercise 1.40
+
+(define (cubic a b c) (lambda (x) (+ (* x x x) (* a x x) (* b x) c)))
+
+
+;; exercise 1.41
+(define (double f) (lambda (x) (f (f x))))
+(define (inc x) (+ x 1))
+(((double (double double)) inc) 5)
+
+
+;;exercise 1.42
+
+(define (compose f g) (lambda (x) (f (g x))))
+
+
+;;exercise 1.43
+
+(define (compose_n f n) (define (iter count result) (if (= count 0) result (iter (- count 1) (compose f result)))) (iter n (lambda (x) x)))
+
+((compose_n square 2) 5)
+
+;Value: 625
+
+
+;;;exercise 1.44
+
+(define (smooth f) (lambda (x) (/ (+ (f (+ x dx)) (f x) (f (- x dx))) 3.0)))
+
+(define (smooth_n f n) ((compose_n smooth n) f))
+
+
+
+
+
+
 
 
 
