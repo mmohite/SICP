@@ -171,38 +171,69 @@
 
 ;;; exercise 2.14
 
+(define (add_interval x y)
+  (make_interval (+ (lower_bound x) (lower_bound y))
+                 (+ (upper_bound x) (upper_bound y))))
+
 (define (par1 r1 r2) (div_interval (mul_interval r1 r2) (add_interval r1 r2)))
 
-(define (par2 r1 r2)
+
+(define (par2 r1 r2)zxv
+  (let ((one (make_interval 1 1))) 
+    (div_interval one
+                  (add_interval (div_interval one r1)
+                                (div_interval one r2)))))
+
+(define i1 (make_interval_center_percentage 3.5 .000005))
+
+(define i2 (make_interval_center_percentage 3.5 .00000005))
+
+(par1 i1 i2)
+(par2 i1 i2)
+
+;;;exercise 2.17
+(define squares (list 1 4 9 16 25))
+
+(define odds (list 1 3 5 7))
+
+(define (append l1 l2) (if (null? l1) l2 (cons (car l1) (append (cdr l1) l2))))
+
+(append odds squares)
+
+(append squares odds)
+
+(define (last_pair l) (if (or (null? l) (null? (cdr l))) l (last_pair (cdr l))))
+
+;;;exercise 2.18
+
+(define (reverse l) (define (reverse_iter lx a) (if (null? lx) a (reverse_iter (cdr lx) (cons (car lx) a)))) (reverse_iter l (list )))
+
+;;;exercise 2.19
+;;coin change
+
+(define (count-change amount)
+  (cc amount coin_list))
+(define (cc amount coin_list)
+  (cond ((= amount 0) 1)
+        ((or (< amount 0) (null? coin_list)) 0)
+        (else (+ (cc amount
+                     (cdr coin_list))
+                 (cc (- amount
+                        (car coin_list))
+                     coin_list)))))
 
 
+(define us_list (list 1 10 5 25 50))
 
+;; exercise 2.20
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(define (same_parity . l) 
+    (define (check x) (= (remainder (car l) 2) (remainder x 2)))
+    (define (same_parity_recur lx)
+        (cond 
+            ((null? lx) (list )) 
+            ((check (car lx)) (cons (car lx) (same_parity_recur (cdr lx))))
+            (else (same_parity_recur (cdr lx))))) (same_parity_recur l))
 
 
 
