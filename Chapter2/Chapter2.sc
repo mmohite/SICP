@@ -235,16 +235,24 @@
             ((check (car lx)) (cons (car lx) (same_parity_recur (cdr lx))))
             (else (same_parity_recur (cdr lx))))) (same_parity_recur l))
 
+(define (scale_list l f) (if (null? l) (list ) (cons (* (car l) f) (scale_list (cdr l) f))))
+
+(define (map proc l) (if (null? l) (list ) (cons (proc (car l)) (map proc (cdr l)))))
+
+;;exercise 2.21
+
+(define (square-list items)
+  (if (null? items)
+      (list )
+      (cons (square (car items)) (square-list (cdr items)))))
 
 
+(define (square-list items)
+  (map square items))
 
+;;exercise 2.23
 
-
-
-
-
-
-
+(define (for-each f l) (if (not (null? l)) (f (car l))) (if (null? l) #t (for-each f (cdr l))))
 
 
 
