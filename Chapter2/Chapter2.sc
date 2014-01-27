@@ -255,21 +255,42 @@
 (define (for-each f l) (if (not (null? l)) (f (car l))) (if (null? l) #t (for-each f (cdr l))))
 
 
+;;exercise 2.25
+
+(1 3 (5 7) 9)
+
+(car (cdr (car (cdr (cdr test)))))
+
+((7))
+
+(car (car test))
+
+(1 (2 (3 (4 (5 (6 7))))))
+
+(define test (list 1 (list 2 (list 3 (list 4 (list 5 (list 6 7)))))))
+
+(car (cdr (car (cdr (car (cdr (car (cdr (car (cdr (car (cdr test))))))))))))
+
+;;;exercise 2.26
+
+(define x (list 1 2 3))
+(define y (list 4 5 6))
+
+;; exercise 2.27
+
+(define (deep_reverse l) 
+    (define (reverse_iter lx a)
+        (cond ((null? lx) a)
+              ((not (pair? lx)) lx)
+              (else (reverse_iter (cdr lx) (cons (reverse_iter (car lx) (list )) a)))))
+    (reverse_iter l (list )))
 
 
+(deep_reverse (list (list 1 2) (list 3 4)))
 
+;Value 16: ((4 3) (2 1))
 
-
-
-
-
-
-
-
-
-
-
-
+(deep_reverse (1 (2 (3 (4 (5 (6 7)))))))
 
 
 
