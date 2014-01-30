@@ -292,6 +292,109 @@
 
 (deep_reverse (1 (2 (3 (4 (5 (6 7)))))))
 
+;;exercise 2.28
+
+(define (append l1 l2) (if (null? l1) l2 (cons (car l1) (append (cdr l1) l2))))
+
+(define (fringe l) 
+        (cond ((null? l) (list ))
+              ((not (pair? l)) (list l))
+              (else (append (fringe (car l)) (fringe (cdr l))))))
+
+;;exercise 2.29
+
+(define (make-mobile left right)
+  (list left right))
+
+(define (make-branch length structure)
+  (list length structure))
+
+(define (get_left a) (car a))
+
+(define (get_right a) (car (cdr a)))
+
+(define (left-branch mobile) (get_left mobile))
+
+(define (right-branch mobile) (get_right mobile))
+
+(define (branch-length branch) (get_left branch))
+
+(define (branch-structure branch) (get_right branch))
+
+(define (total_weight mobile)
+        (cond ((null? mobile) 0)
+              ((not (pair? mobile)) mobile)
+              (else (+ (total_weight (branch-structure (left-branch mobile))) (total_weight (branch-structure (right-branch mobile)))))))
+
+(define l1 (make-branch 1 1))
+
+(define l2 (make-branch 1 1))
+
+(define l3 (make-branch 1 1))
+
+(define l4 (make-branch 1 1))
+
+(define m1 (make-mobile l1 l2))
+
+(define m2 (make-mobile l3 l4))
+
+(define l5 (make-branch 1 m1))
+
+(define l6 (make-branch 1 m2))
+
+(define root (make-mobile l5 l6))
+
+(define (make-mobile left right)
+  (cons left right))
+
+(define (make-branch length structure)
+  (cons length structure))
+
+(define (balanced_mobile? mobile)
+    (cond ((null? mobile) #t)
+          ((not (pair? mobile)) #t)
+          (else (and (= (torque (left-branch mobile)) (torque (right-branch mobile))) (balanced_mobile? (branch-structure (left-branch mobile))) (balanced_mobile? (branch-structure (right-branch mobile)))))))
+
+
+
+(define (torque branch) (if (pair? (branch-structure branch)) 
+    (* (branch-length branch) (total_weight (branch-structure branch)))
+    (* (branch-length branch) (branch-structure branch))))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
