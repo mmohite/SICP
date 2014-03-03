@@ -162,7 +162,7 @@
 
 
 (define (average a b) (/ (+ a b) 2))
-(define (close_enough? a b) (< (abs (- a b)) .001))
+(define (close_enough? a b) (< (abs (- a b)) .0000001))
 
 
 (define (search f neg_value pos_value) (let ((a (f neg_value)) (b (f pos_value))(avg (average neg_value pos_value))) 
@@ -261,11 +261,20 @@
 
 (define (smooth_n f n) ((compose_n smooth n) f))
 
+;;;exercise 1.45
 
+(define (nth_root x n) (fixed_point ((compose_n average_damp (- n 2)) (lambda (y) (/ x (exp y (- n 1))))) 1.0))
 
+;;;exercise 1.46
 
+(define (iterative-improve improve good_enough?) 
+    (define (iterate guess) 
+    (if (good_enough? guess (improve guess)) 
+    (improve guess)
+    (iterate (improve guess))))
+    (lambda (guess) (iterate (improve guess))))
 
-
+(define (fixed_point f guess) ((iterative-improve f close_enough?) guess))
 
 
 

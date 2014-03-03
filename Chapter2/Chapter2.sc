@@ -355,11 +355,486 @@
           ((not (pair? mobile)) #t)
           (else (and (= (torque (left-branch mobile)) (torque (right-branch mobile))) (balanced_mobile? (branch-structure (left-branch mobile))) (balanced_mobile? (branch-structure (right-branch mobile)))))))
 
-
-
 (define (torque branch) (if (pair? (branch-structure branch)) 
     (* (branch-length branch) (total_weight (branch-structure branch)))
     (* (branch-length branch) (branch-structure branch))))
+
+(define (scale_tree tree factor) 
+    (cond ((null? tree) (list ))
+        ((not (pair? tree)) (* tree factor))
+        (else (cons (scale_tree (car tree) factor) (scale_tree (cdr tree) factor)))))
+
+(scale_tree (list 1 (list 2 (list 3 4) 5) (list 6 7)) 10)
+
+(define (scale_tree tree factor) 
+    (map (lambda (subtree) 
+            (cond ((null? subtree) subtree) 
+                ((pair? subtree) (scale_tree subtree factor))
+                (else (* subtree factor)))) tree))
+
+
+;;;exercise 2.30
+
+(define (square_tree tree) 
+    (map (lambda (subtree) 
+            (cond ((null? subtree) subtree) 
+                ((pair? subtree) (square_tree subtree))
+                (else (square subtree)))) tree))
+
+(define (square_tree tree) 
+    (cond ((null? tree) tree)
+        ((pair? tree) (cons (square_tree (car tree)) (square_tree (cdr tree))))
+        (else (square tree))))
+
+(square_tree
+ (list 1
+       (list 2 (list 3 4) 5)
+       (list 6 7)))
+
+;Value 17: (1 (4 (9 16) 25) (36 49))
+
+;;exercise 2.31
+
+(define (tree_map tree f)
+    (cond ((null? tree) tree)
+        ((pair? tree) (cons (tree_map (car tree) f) (tree_map (cdr tree) f)))
+        (else (f tree))))
+
+(define (square_tree tree) (tree_map tree square))
+
+
+;;exercise 2.32
+
+(define (subsets s)
+    (if (null? s)
+        (list (list ))
+        (let ((rest (subsets (cdr s))))
+            (append rest (map (lambda (l) (append (list (car s)) l)) rest)))))
+
+
+(define (filter predicate sequence)
+    (cond ((null? sequence) (list ))
+        ((predicate (car sequence)) (cons (car sequence) (filter predicate (cdr sequence))))
+        (else (filter predicate (cdr sequence)))))  
+
+(define (accumulate op initial sequence)
+    (cond ((null? sequence) initial)
+        (else (op (car sequence) (accumulate op initial (cdr sequence))))))
+
+(define (enumerate-interval low high)
+    (cond ((> low high) (list ))
+        (else (cons low (enumerate-interval (+ low 1) high)))))
+
+(define (enumerate-leaves root)
+    (cond ((null? root) (list ))
+        ((pair? root) (append (enumerate-leaves (car root)) (enumerate-leaves (cdr root))))
+        (else (list root))))
+
+(define (sum-odd-square-leaves root)
+    (accumulate + 0 (map square (filter odd? (enumerate-leaves root)))))
+
+(define (even-fib n)
+    (accumulate cons (list ) (filter even? (map fibonacci (enumerate-interval 0 n)))))
+
+;; exercise 2.33
+
+(define (map p sequence)
+  (accumulate (lambda (x y) (cons (p x) y)) (list ) sequence))
+
+(define (append seq1 seq2)
+  (accumulate cons seq2 seq1))
+
+
+(define (length sequence)
+  (accumulate (lambda (x y) (+ 1 y)) 0 sequence))
+
+
+;;exercise 2.34
+(define (horner-eval x coefficient-sequence)
+  (accumulate (lambda (this-coeff higher-terms) (+ this-coeff (* x higher-terms)))
+              0
+              coefficient-sequence))
+
+;;exercise 2.35
+(define (count-leaves t)
+  (accumulate + 0 (map (lambda (x) 1) (enumerate-leaves t))))
+
+;;exercise 2.36
+(define (accumulate-n op init seqs)
+  (if (null? (car seqs))
+      (list )
+      (cons (accumulate op init (map (lambda (l) (car l)) seqs))
+            (accumulate-n op init (map (lambda (l) (cdr l)) seqs)))))
+
+;;exercise 2.37
+(define (matrix-*-vector m v)
+  (map (lambda (l) (accumulate + 0 (accumulate-n * 1 (list l v)))) m))
+
+(define (transpose mat)
+  (accumulate-n cons (list ) mat))
+
+(define (matrix-*-matrix m n)
+  (let ((cols (transpose n)))
+    (map (lambda (v) (matrix-*-vector cols v)) m)))
+
+;;exercise 2.38
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
