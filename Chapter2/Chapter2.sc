@@ -480,50 +480,69 @@
 ;;exercise 2.38
 
 
+(define (fold-left op initial sequence)
+    (define (iter result rest)
+        (if (null? rest) result
+            (iter (op result (car rest)) (cdr rest))))
+    (iter initial sequence))
+
+(define (fold-right op initial sequence)
+    (accumulate op initial sequence))
 
 
+;;exercise 2.39
+
+(define (reverse sequence)
+  (fold-right (lambda (x y)  (append y (list x))) (list ) sequence))
+
+(define (reverse sequence)
+  (fold-left (lambda (x y) (append (list y) x)) (list ) sequence))
 
 
+;;
+(define (prime-sum? pair)
+    (prime? (+ (car pair) (cadr pair))))
+
+(define (make-pair-sum pair)
+    (list (car pair) (cadr pair) (+ (car pair) (cadr pair))))
+
+(define (flatmap proc l)
+    (accumulate append () (map proc l)))
+
+(define (prime-sum-pairs n)
+    (map make-pair-sum 
+        (filter prime-sum? 
+            (flatmap (lambda (i) (map (lambda (j) (list i j)) (enumerate-interval 1 (- i 1)))) (enumerate-interval 1 n)))))
+
+;; permutations
+
+(define (remove x s)
+    (filter (lambda (y) (not (= x y))) s))
+
+(define (permutations s)
+    (if (null? s) (list (list ))
+        (flatmap (lambda (x) (map (lambda (l) (append (list x) l)) (permutations (remove x s)))) s)))
 
 
+;; exercise 2.40
+
+(define (unique-pairs n)
+    (flatmap (lambda (i) (map (lambda (j) (list i j)) (enumerate-interval 1 (- i 1)))) (enumerate-interval 1 n)))
+
+(define (prime-sum-pairs n)
+    (map make-pair-sum 
+        (filter prime-sum? 
+            (unique-pairs n))))
 
 
+;; exercise 2.41
 
+(define (unique-triples n)
+    (flatmap (lambda (pair) (map (lambda (x) (append pair (list x))) (enumerate-interval 1 (- (cadr pair) 1))))
+        (unique-pairs n)))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(define (ordered-triples n s)
+    (filter (lambda (l) (= (accumulate + 0 l) s)) (unique-triples n)))
 
 
 
