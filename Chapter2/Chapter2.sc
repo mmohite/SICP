@@ -550,41 +550,105 @@
 
 
 
+;;exercise 2.53
+(define (memq item x)
+    (cond ((null? x) #f)
+        ((eq? item (car x)) x)
+        (else (memq item (cdr x)))))
+
+;;exercise 2.54
+
+(define (equal? x y)
+    (cond ((and (null? x) (null? y)) #t)
+        ((and (pair? (car x)) (pair? (car y))) (and (equal? (car x) (car y)) (equal? (cdr x) (cdr y))))
+        ((and (not (pair? (car x))) (not (pair? (car y)))) (and (eq? (car x) (car y)) (equal? (cdr x) (cdr y))))
+        (else #f)))
 
 
+;;Symbolic diffrentiation
+
+(define (variable? e)
+   (symbol? e))
+
+(define (same-variable? v1 v2)
+    (and (variable? v1) (variable? v2) (eq? v1 v2)))
+
+(define (make-sum a1 a2)
+    (list '+ a1 a2))
+
+(define (make-product a1 a2)
+    (list '* a1 a2))
+
+(define (sum? e)
+    (and (pair? e) (eq? (car e) '+)))
+
+(define (addend s)
+    (cadr s))
+
+(define (augend s)
+    (caddr s))
+
+(define (product? e)
+    (and (pair? e) (eq? (car e) '*)))
+
+(define (multiplier p)
+    (cadr p))
+
+(define (multiplicand p)
+    (caddr p))
 
 
+(define (deriv exp var)
+    (cond ((number? exp) 0)
+        ((variable? exp)
+            (if (same-variable? exp var) 1 0))
+        ((sum? exp) 
+            (make-sum (deriv (addend exp) var) (deriv (augend exp) var)))
+        ((product? exp) 
+            (make-sum 
+                (make-product (multiplier exp) (deriv (multiplicand exp) var)) 
+                (make-product (multiplicand exp) (deriv (multiplier exp) var))))))
+
+;;exercise 2.56
+
+(define (=number? e n)
+    (and (number? e) (= e n)))
 
 
+(define (make-exponent u n)
+    (cond ((=number? n 0) 1)
+        ((=number? u 0) 0)
+    (else (list '** u n))))
 
+(define (exponentiation? e)
+    (and (pair? e) (eq? (car e) '**)))
 
+(define (base e)
+    (caddr e))
 
+(define (exponent e)
+    (cadr e))
 
+(define (deriv exp var)
+    (cond ((number? exp) 0)
+        ((variable? exp)
+            (if (same-variable? exp var) 1 0))
+        ((sum? exp) 
+            (make-sum (deriv (addend exp) var) (deriv (augend exp) var)))
+        ((product? exp) 
+            (make-sum 
+                (make-product (multiplier exp) (deriv (multiplicand exp) var)) 
+                (make-product (multiplicand exp) (deriv (multiplier exp) var))))
+        ((exponentiation? exp) 
+            (make-product (make-product (base exp) (make-exponent (exponent exp) (- (base exp) 1))) (deriv (exponent exp) var)))))
 
+(define (augend e)
+    (cond ((null? (cdddr e)) (caddr e))
+        (else (append '(+) (cddr e)))))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(define (multiplicand e)
+    (cond ((null? (cdddr e)) (caddr e))
+        (else (append '(*) (cddr e)))))
 
 
 
