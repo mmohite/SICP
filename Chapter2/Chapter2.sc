@@ -560,6 +560,7 @@
 
 (define (equal? x y)
     (cond ((and (null? x) (null? y)) #t)
+        ((and (not (pair? x)) (not (pair? y))) (eq? x y))
         ((and (pair? (car x)) (pair? (car y))) (and (equal? (car x) (car y)) (equal? (cdr x) (cdr y))))
         ((and (not (pair? (car x))) (not (pair? (car y)))) (and (eq? (car x) (car y)) (equal? (cdr x) (cdr y))))
         (else #f)))
@@ -650,16 +651,62 @@
     (cond ((null? (cdddr e)) (caddr e))
         (else (append '(*) (cddr e)))))
 
+;;sets as unordered lists
+
+(define (element-of-set? x set)
+    (cond ((null? set) #f)
+        ((equal? x (car set)) #t)
+        (else (element-of-set? x (cdr set)))))
+
+(define (adjoin-set x set)
+    (cond ((element-of-set? x set) set)
+        (else (cons x set))))
+
+(define (intersection-set set1 set2)
+    (cond ((or (null? set1) (null? set2)) (list ))
+        ((element-of-set? (car set1) set2) (cons (car set1) (intersection-set (cdr set1) set2)))
+        (else (intersection-set (cdr set1) set2))))
+
+;;exercise 2.59
+
+(define (union-set set1 set2)
+    (cond ((or (null? set1) (null? set2)) set2)
+        ((element-of-set? (car set1) set2) (union-set (cdr set1) set2))
+        (else (cons (car set1) (union-set (cdr set1) set2)))))
 
 
+;;sets as ordered list
+
+(define (element-of-set? x set)
+    (cond ((null? set) #f)
+        ((= (car set) x) #t)
+        ((< (car set) x) (element-of-set? x (cdr set)))
+        (else #f)))
 
 
+(element-of-set? 0 (list 1 2 3 4 5 6 7))
 
+(define (intersection-set set1 set2)
+    (cond ((or (null? set1) (null? set2)) (list ))
+        ((= (car set1) (car set2)) (cons (car set1) (intersection-set (cdr set1) (cdr set2))))
+        ((< (car set1) (car set2)) (intersection-set (cdr set1) set2))
+        (else (intersection-set set1 (cdr set2)))))
 
+;;exercise 2.61
+(define (adjoin-set x set)
+    (cond ((null? set) (cons x (list )))
+        ((> x (car set)) (cons (car set) (adjoin-set x (cdr set))))
+        ((< x (car set)) (cons x set))
+        (else set)))
 
+;;exercise 2.62
 
-
-
+(define (union-set set1 set2)
+    (cond ((null? set1) set2)
+        ((null? set2) set1)
+        ((< (car set1) (car set2)) (cons (car set1) (union-set (cdr set1) set2)))
+        ((> (car set1) (car set2)) (cons (car set2) (union-set set1 (cdr set2))))
+        ((= (car set1) (car set2)) (union-set set1 (cdr set2)))))
 
 
 
