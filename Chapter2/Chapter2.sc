@@ -709,57 +709,192 @@
         ((= (car set1) (car set2)) (union-set set1 (cdr set2)))))
 
 
+;;sets using binary search tree
+
+(define (entry tree) (car tree))
+
+(define (left-branch tree) (cadr tree))
+
+(define (right-branch tree) (caddr tree))
+
+(define (make-tree entry left right)
+    (list entry left right))
+
+(define (element-of-set? x set)
+    (cond ((null? set) #f)
+        ((= x (entry set)) #t)
+        ((< x (entry set)) (element-of-set? x (left-branch set)))
+        (else (element-of-set? x (right-branch set)))))
+
+
+(define (adjoin-set x set)
+    (cond ((null? set) (make-tree x (list ) (list )))
+        ((= x (entry set)) set)
+        ((< x (entry set)) (make-tree (entry set) (adjoin-set x (left-branch set)) (right-branch set)))
+        (else (make-tree (entry set) (left-branch set) (adjoin-set x (right-branch set))))))
+
+;;exercise 2.66
+
+(define (lookup key set-of-records)
+    (cond ((null? set-of-records) #f)
+        ((= key (entry set-of-records)) (entry set-of-records))
+        ((< key (entry set-of-records)) (lookup key (left-branch set-of-records)))
+        (else (lookup key (right-branch set-of-records)))))
+
+
+
+;;Huffman tree
+
+(define (make-leaf symbol weight)
+    (list 'leaf symbol weight)))
+
+(define (leaf? object)
+    (eq? (car object) 'leaf))
+
+(define (symbol-leaf x)
+    (cadr x))
+
+(define (weight-leaf x)
+    (caddr x))
+
+(define (make-code-tree left right)
+    (list left right
+        (append (symbols left) (symbols right))
+        (+ (weight left) (weight right))))
+
+(define (left-branch tree)
+    (car tree))
+
+(define (right-branch tree)
+    (cadr tree))
+
+(define (symbols tree)
+    (cond ((leaf? tree) (list (symbol-leaf tree)))
+        (else (caddr tree)))) 
+
+(define (weight tree)
+    (cond ((leaf? tree) (weight-leaf tree))
+        (else (cadddr tree)))) 
+ 
+(define (decode bits tree)
+    (define (decode-1 bits current-branch)
+        (if (null? bits)
+            (list )
+            (let ((next-branch
+                    (choose-branch (car bits) current-branch)))
+                (if (leaf? next-branch)
+                    (cons (symbol-leaf next-branch) (decode-1 (cdr bits) tree))
+                    (decode-1 (cdr bits) next-branch)))))
+    (decode-1 bits tree))
+
+(define (choose-branch bit branch)
+    (cond ((= bit 0) (left-branch branch))
+        (else (left-branch branch))))
+
+;;exercise 2.67
+
+ADABBCA
+
+;;exercise 2.68
+(define (encode-symbol message tree)
+    (cond ((leaf? tree) (list ))
+        (else (cons (get-next-bit message tree) (encode-symbol message (get-next-branch message tree))))))
+
+
+(define (get-next-bit message tree)
+    (cond ((element-of-set? message (symbols (left-branch tree))) '0)
+        (else '1)))
+
+(define (get-next-branch message tree)
+    (cond ((element-of-set? message (symbols (left-branch tree))) (left-branch tree))
+        (else (right-branch tree))))
+
+(define (encode message tree)
+  (if (null? message)
+      '()
+      (append (encode-symbol (car message) tree)
+              (encode (cdr message) tree))))
+
+;;exercise 2.69
+
+(define (adjoin-set x set)
+    (cond ((null? set) (list x))
+        ((< (weight x) (weight (car set))) (cons x set))
+        (else (cons (car set) (adjoin-set x (cdr set))))))
+
+(define (make-leaf-set pairs)
+  (if (null? pairs)
+      '()
+      (let ((pair (car pairs)))
+        (adjoin-set (make-leaf (car pair)    ; symbol
+                               (cadr pair))  ; frequency
+                    (make-leaf-set (cdr pairs))))))
+
+(define (generate-huffman-tree pairs)
+  (successive-merge (make-leaf-set pairs)))
+
+(define (successive-merge set)
+    (cond ((null? set) (list ))
+        ((null? (cdr set)) (car set))
+        (else (successive-merge (adjoin-set (make-code-tree (car set) (cadr set)) (cddr set))))))
+
+'((A 4) (B 2) (C 1) (D 1))
+
+
+;;exercise 2.70
+'((A 2) (BOOM 1) (GET 2) (JOB 2) (NA 16) (SHA 3) (YIP 9) (WAH 1))
+
+
+'(Get a job Sha na na na na na na na na Get a job Sha na na na na na na na na Wah yip yip yip yip yip yip yip yip yip Sha boom)
+
+
+(length (encode '(Get a job Sha na na na na na na na na Get a job Sha na na na na na na na na Wah yip yip yip yip yip yip yip yip yip Sha boom) sample-tree))
+
+;;with fixed length encoding 108 bits
+
+;;exercise 2.71
+;;1 bit for most frequently used symbol
+;; n - 1 bits for the least frequently occurring symbol
+
+
+
+;;exercise 2.73
+
+(define (deriv exp var)
+  (cond ((number? exp) 0)
+        ((variable? exp) (if (same-variable? exp var) 1 0))
+        ((sum? exp)
+         (make-sum (deriv (addend exp) var)
+                   (deriv (augend exp) var)))
+        ((product? exp)
+         (make-sum
+           (make-product (multiplier exp)
+                         (deriv (multiplicand exp) var))
+           (make-product (deriv (multiplier exp) var)
+                         (multiplicand exp))))
+        <more rules can be added here>
+        (else (error "unknown expression type -- DERIV" exp))))
+
+
+(define (install-sum-deriv)
+    (define (deriv-sum exp var)
+        (make-sum (deriv (addend exp) var)
+        (deriv (augend exp) var)))
+    (put 'deriv '+ deriv-sum))
+
+(define (install-product-deriv)
+    (define (deriv-product exp var)
+        (make-sum
+           (make-product (multiplier exp)
+                         (deriv (multiplicand exp) var))
+           (make-product (deriv (multiplier exp) var)
+                         (multiplicand exp))))
+    (put 'deriv '* deriv-product)))
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+;;exercise 2.75
 
 
 
