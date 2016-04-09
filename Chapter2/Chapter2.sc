@@ -891,29 +891,76 @@ ADABBCA
                          (multiplicand exp))))
     (put 'deriv '* deriv-product)))
 
-
-
-
 ;;exercise 2.75
 
+(define (make-from-mag-ang r a)
+  (define (dispatch op)
+    (cond ((eq? op 'real-part) (* r (cos a)))
+          ((eq? op 'imag-part) (* r (sin a)))
+          ((eq? op 'magnitude)
+           r)
+          ((eq? op 'angle) a)
+          (else
+           (error "Unknown op -- MAKE-FROM-REAL-IMAG" op))))
+  dispatch)
+
+;;exercise 2.77
+;; (magnitude z)
+;; (((get 'magnitude '(complex)) (cadr z)))
+;; (((get 'magnitude '(rectangular)) (caddr z)))
+
+;;exercise 2.78
+(define (attach-tag type-tag contents)
+    (cond ((number? contents) contents)
+        (else (cons type-tag contents))))
+
+(define (type-tag datum)
+    (cond ((number? datum) datum)
+        (else (car datum))))
+
+(define (contents datum)
+    (cond ((number? datum) datum)
+        (else (cdr datum))))
+
+;;exercise 2.79
+;;public interface
+(define (equ? x y)
+    (apply-generic 'equ? x y))
+
+;;scheme-numbers
+
+(2d-put! 'equ? '(scheme-number scheme-number)
+    (lambda (x y) (= x y))
+
+;;rational-numbers
+
+(2d-put! 'equ? '(rational rational)
+    (lambda (x y) (= (* (numer x) (denom y)) (* (numer y) (denom x)))))
+
+;;complex
+
+(2d-put! 'equ? '(complex complex)
+    (lambda (x y) (and (= (real-part x) (real-part y)) (= (imag-part x) (imag-part y)))))
 
 
+;;exercise 2.80
+;;public interface
+(define (=zero? x)
+    (apply-generic '=zero? x))
 
+;;scheme-numbers
 
+(2d-put! '=zero? '(scheme-number)
+    (lambda (x) (= x 0))
 
+;;rational-numbers
+(2d-put! '=zero? '(rational)
+    (lambda (x) (= (numer x) 0)))
 
+;;complex
 
-
-
-
-
-
-
-
-
-
-
-
+(2d-put! '=zero? '(complex)
+    (lambda (x) (and (= (real-part x) 0) (= (imag-part x) 0))))
 
 
 
